@@ -10,7 +10,8 @@ void LSM6DSL_WriteByte(uint8_t LSM6DSL_reg, uint8_t LSM6DSL_data)
 {
 	uint8_t temp=0,n=0;
 	while(1){
-		temp=I2C_WriteByteOneReg(I2C0,LSM6DSL_I2C_SLA ,  LSM6DSL_reg, LSM6DSL_data);
+		I2C_WriteByteOneReg(I2C0,LSM6DSL_I2C_SLA ,  LSM6DSL_reg, LSM6DSL_data);
+		temp=I2C_ReadByteOneReg(LSM6DSL_I2C_PORT,LSM6DSL_I2C_SLA,LSM6DSL_reg);
 		n++;
 		if(temp==LSM6DSL_data||n>10)
 			break;
@@ -138,7 +139,7 @@ void I2C1readGyro(uint8_t* data){
 	LSM6DSL_Read6Bytes(LSM6DSL_ACC_GYRO_OUTX_L_G,data);  //LoByte is at first.
 }
 
-
+extern void Init_BMM150();
 uint8_t AccOn=0,GyroOn=0,MagnOn=0;
 void SensoODR_ONOFF_Handler(uint8_t u8data){
 	int timerPriod=0;
@@ -189,6 +190,8 @@ void SensoODR_ONOFF_Handler(uint8_t u8data){
 		TIMER_EnableInt(TIMER1);
 		NVIC_EnableIRQ(TMR1_IRQn);
 		TIMER_Start(TIMER1);
+		Init_BMM150();
+		Init_LSM6DSL();
 		//printf("nine sensor open: %d % d %d\n",AccOn,GyroOn,MagnOn);
 	}
 	else{

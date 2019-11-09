@@ -75,7 +75,7 @@ void LEDBlink()
 	}
 }
 
-
+extern void I2C1PowerSpy();
 
 void TMR0_IRQHandler(void)                    //used for btn9 long press count
 { 
@@ -84,6 +84,7 @@ void TMR0_IRQHandler(void)                    //used for btn9 long press count
       TIMER_ClearIntFlag(TIMER0);
 			Btn9LongPressHandler();
 			LEDBlink();
+			I2C1PowerSpy();
 			//BMM150Test();
 			//BMM_whoami();
     }

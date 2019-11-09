@@ -32,7 +32,7 @@ void I2C1_GPIO_Init(void)
 void I2C1_Init(void)
 {
     /* Open I2C module and set bus clock */
-    I2C_Open(I2C1, 400000);
+    I2C_Open(I2C1, 100000);
     /* Get I2C1 Bus Clock */
     //printf("I2C1 clock %d Hz\n", I2C_GetBusClockFreq(I2C1));
     /* Set I2C 4 Slave Addresses */
@@ -43,7 +43,9 @@ void I2C1_Init(void)
 		I2C_EnableWakeup  ( I2C1 );
 		/* I2C enter no address SLV mode */
     I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI_AA);
+		//I2C_EnableTimeout(I2C1,3);
 }
+
 
 void I2C1_Close(void)
 {
@@ -209,6 +211,9 @@ void I2C1_IRQHandler(void)
     {
         /* Clear I2C1 Timeout Flag */
         I2C_ClearTimeoutFlag(I2C1);
+				//I2C_SET_CONTROL_REG(I2C1, I2C_CTL_STO_SI);  
+				//I2C_STOP(I2C1);
+				//I2C_Trigger(I2C1,0,1,1,1);
     }
     else
     {

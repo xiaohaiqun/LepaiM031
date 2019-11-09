@@ -9,7 +9,7 @@ uint8_t PowerState=1;
 uint8_t IP5328_WriteByte(uint8_t IP5328_reg, uint8_t IP5328_data)
 {
 	uint8_t flag=0,n=0,temp;
-	for(n=0;n<10;n++){
+	for(n=0;n<100;n++){
 		flag=I2C_WriteByteOneReg(I2C0,ip5328_slave_adress, IP5328_reg, IP5328_data);
 		temp=I2C_ReadByteOneReg(I2C0,ip5328_slave_adress,IP5328_reg);
 		if(temp==IP5328_data)
@@ -59,12 +59,16 @@ uint8_t chg_status_Read()
 #define vout12ctl 0x59
 void OpenVout1()
 {
-	uint8_t state=IP5328_ReadByte(vout12ctl);
+	uint8_t state=IP5328_ReadByte(0x0E);
+	IP5328_WriteByte(0x0E, state|0x04);
+	state=IP5328_ReadByte(vout12ctl);
 	IP5328_WriteByte(vout12ctl, (state|0x0C));
 }
 void CloseVout1()
 {
-	uint8_t state=IP5328_ReadByte(vout12ctl);
+	uint8_t state=IP5328_ReadByte(0x0E);
+	IP5328_WriteByte(0x0E, state|0x04);
+	state=IP5328_ReadByte(vout12ctl);
 	IP5328_WriteByte(vout12ctl, (state&0xFB));
 }
 void OpenVout2()
@@ -140,6 +144,21 @@ void IP5328Init(){
 
 #define BATOCV_DAT_L  0x7A
 #define BATOCV_DAT_H  0x7B          //OCV=BATOCV*0.26855mv+2.6V 电池的开路电压，用来估算电量
+extern uint8_t NowBtn;
+uint8_t BATpower=0,ChargeInfo=0;
+void I2C1PowerSpy()
+{
+	uint8_t BATpower_Temp=0,ChargeInfo_Temp=0;
+	BATpower_Temp=IP5328_ReadByte(0xDB)&0x1F;          //灯显模式计算的电量
+	ChargeInfo_Temp=IP5328_ReadByte(0xD7);               //充电状态	
+	if(BATpower!=BATpower_Temp||ChargeInfo!=ChargeInfo_Temp)
+	{
+		BATpower=BATpower_Temp;
+		ChargeInfo=ChargeInfo_Temp;
+		NowBtn=0x55;
+		PB5=!PB5;
+	}
+}
 
 uint8_t PowerData[4]={0};           //电池读取数据缓存，4个字节，公用
 void I2C1readPower()          //读取电池电量估计以及充电状态信息，两个字节

@@ -32,14 +32,15 @@ void reset(){
 		TIMER_Init();
 		I2C1_Init();
 		I2C0_Init();
-    Init_LSM6DSL();
 		Init_BMM150();
+    Init_LSM6DSL();	
 		IP5328Init();	
 }
 extern uint8_t PowerState;
 int32_t main()
 {
 		reset();
+		//BMM150Test();
 		//LSM6DSL_test();	
 		PowerState=1;
 		while(1){
