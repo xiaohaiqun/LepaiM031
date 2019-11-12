@@ -111,7 +111,7 @@ void LSM6DSL_test(){
 		gyroX = Read_LSM6DSL_GyroX();
 		gyroY = Read_LSM6DSL_GyroY();
 		gyroZ = Read_LSM6DSL_GyroZ();		
-		printf("%6d, %6d, %6d \n", gyroX, gyroY, gyroZ);	
+		//printf("%6d, %6d, %6d \n", gyroX, gyroY, gyroZ);	
 		CLK_SysTickDelay(1000000000);
 		}
 }

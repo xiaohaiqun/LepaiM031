@@ -27,7 +27,7 @@ void BMM150_Read6Bytes(uint8_t BMM_reg,uint8_t* data)
 
 void Init_BMM150()
 {
-	printf("BMM150 init...............\n");
+	//printf("BMM150 init...............\n");
 	I2C_WriteByteOneReg(I2C0,0x10,0x4B,0x01);
 	I2C_WriteByteOneReg(I2C0,0x10,0x4C,0x38);	
 }
@@ -35,7 +35,7 @@ uint8_t BMM_whoami()
 {
 	uint8_t ID=0;
 	ID=BMM_ReadByte(BMM050_CHIP_ID);
-	printf("BMM's ID is:%x\n",ID);
+	//printf("BMM's ID is:%x\n",ID);
 	return ID;
 }
 
@@ -74,11 +74,11 @@ void BMM150Test(){
 		magy=BMM_ReadByte(magx);
 		printf("%x\n",magy);*/
 		I2C_WriteByteOneReg(I2C0,0x10,0x4C,0x38);	
-		printf("0x4B is:%x\n",BMM_ReadByte(0x4B));
-		printf("0x4C is:%x\n",BMM_ReadByte(0x4C));
-		printf("0x4E is:%x\n",BMM_ReadByte(0x4E));
-		printf("Who am I:%x\n",BMM_whoami());
-		printf("Magn : %6d, %6d, %6d\n", Read_BMM150_X(),Read_BMM150_Y(), Read_BMM150_Z());
+		//printf("0x4B is:%x\n",BMM_ReadByte(0x4B));
+	//printf("0x4C is:%x\n",BMM_ReadByte(0x4C));
+		//printf("0x4E is:%x\n",BMM_ReadByte(0x4E));
+		//printf("Who am I:%x\n",BMM_whoami());
+		//printf("Magn : %6d, %6d, %6d\n", Read_BMM150_X(),Read_BMM150_Y(), Read_BMM150_Z());
 		TIMER_Delay(TIMER0, 1000000);
 											 	 //TIMER_Delay(TIMER0, 1000000);
 	}

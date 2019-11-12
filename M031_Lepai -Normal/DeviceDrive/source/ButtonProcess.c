@@ -15,6 +15,7 @@ uint8_t LEDOnWork=0;
 //this should be added to device_GPIO_Init();
 void Button_GPIO_Init(void)
 {
+		GPIO_SetMode(PB, (BIT12), GPIO_MODE_OUTPUT);
 		GPIO_SetMode(PB, (BIT1|BIT0), GPIO_MODE_QUASI);
 	  GPIO_SetMode(PF, (BIT3|BIT2|BIT15), GPIO_MODE_QUASI);
 		GPIO_SetMode(PA, (BIT12|BIT13|BIT14|BIT15), GPIO_MODE_QUASI); 
@@ -51,6 +52,7 @@ void Button_GPIO_Init(void)
 		GPIO_ENABLE_DEBOUNCE(PA, (BIT12|BIT13|BIT14|BIT15));
 		Btn9timerStart=0;
 		LEDOnWork=0;
+		PB12=0;
 }
 //this shold be added to GPXXXXXXX_IRQHandle()
 static struct{
@@ -230,7 +232,7 @@ void Button_IRQHandler(void)
     } 	
 		///////////////generate IRQ to raspberry//////////////////
 		if(GPIO_GET_INT_FLAG(PB, BIT4)){
-			printf("raspberry shutdown\n");
+			//printf("raspberry shutdown\n");
 			GPIO_CLR_INT_FLAG(PB, BIT4);
 			PowerOff();  //Shut down the power supply of raspbery and m51.
 			PowerState=0;

@@ -52,16 +52,16 @@ int32_t main()
 			/* Enable I2C wake-up */
 			I2C_EnableWakeup(I2C1);
 			g_u8SlvI2CWK = 0;
-			printf("\n");
-			printf("Enter PD 0x%x 0x%x\n", I2C1->CTL0, I2C1->STATUS0);
-			printf("\n");
+			//printf("\n");
+			//printf("Enter PD 0x%x 0x%x\n", I2C1->CTL0, I2C1->STATUS0);
+			//printf("\n");
 			if(((I2C1->CTL0)&I2C_CTL0_SI_Msk) != 0)
 			{
 					I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI);
 			}
 			/* Enter to Power-down mode */
 			//powerDownFunction();
-			printf("CHIP enter power down status.\n");
+			//printf("CHIP enter power down status.\n");
 			UART_WAIT_TX_EMPTY(UART0);
 			CLK_PowerDown();
 			
@@ -70,13 +70,13 @@ int32_t main()
 
 			/* Waitinn for I2C response ACK finish */
 			while(!I2C_GET_WAKEUP_DONE(I2C1));
-			printf("CHIP wake up done.\n");
+			//printf("CHIP wake up done.\n");
 			/* Clear Wakeup done flag, I2C will release bus */
 			I2C_CLEAR_WAKEUP_DONE(I2C1);
 
 			/* Wake-up Interrupt Message */
-			printf("Power-down Wake-up INT 0x%x\n", (unsigned int)((CLK->PWRCTL) & CLK_PWRCTL_PDWKIF_Msk));
-			printf("I2C1 WAKE INT 0x%x\n", I2C1->WKSTS);
+			//printf("Power-down Wake-up INT 0x%x\n", (unsigned int)((CLK->PWRCTL) & CLK_PWRCTL_PDWKIF_Msk));
+			//printf("I2C1 WAKE INT 0x%x\n", I2C1->WKSTS);
 
 			/* Disable power wake-up interrupt */
 			CLK->PWRCTL &= ~CLK_PWRCTL_PDWKIEN_Msk;
@@ -85,11 +85,11 @@ int32_t main()
 			/* Lock protected registers */
 			SYS_LockReg();
 
-			printf("\n");
-			printf("Slave wake-up from power down status.\n");
+			//printf("\n");
+			//printf("Slave wake-up from power down status.\n");
 
-			printf("\n");
-			printf("Slave Waiting for receiving data.\n");
+			//printf("\n");
+		  //printf("Slave Waiting for receiving data.\n");
 			 TIMER_Delay(TIMER0, 1000000);
 			 	 TIMER_Delay(TIMER0, 1000000);
 				 	 TIMER_Delay(TIMER0, 1000000);

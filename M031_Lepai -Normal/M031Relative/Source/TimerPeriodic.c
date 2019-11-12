@@ -41,9 +41,9 @@ void Btn9LongPressHandler()
 		timecounter++;
 		if(timecounter>=5){//长按关机
 			 Btn9timerStart=0;
-			 CloseVout1();
-			 CloseVout2();
-			 LEDChange(yellow);
+			  LEDChange(yellow);
+				CloseVout1();
+			  CloseVout2();			
 			 PowerState=0;
 		}
 		else if(timecounter>=2){

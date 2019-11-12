@@ -34,10 +34,10 @@ void keyInRead(uint8_t key)
 {
 	uint8_t keystate= IP5328_ReadByte(key);
 	if((keystate&0x01)){
-		printf("key is not pressed!\n");
+		//printf("key is not pressed!\n");
 	}
 	else{
-		printf("key is  pressed\n");
+		//printf("key is  pressed\n");
 	}
 }
 #define CHG_STATUS 0xD7
@@ -45,11 +45,11 @@ uint8_t chg_status_Read()
 {
 	uint8_t state=IP5328_ReadByte(CHG_STATUS);
 	if(state&0x80){
-		printf("the battery is in charging\n");
+		//printf("the battery is in charging\n");
 		return 0x01;
 	}
 	else{
-		printf("the battery is not in charging\n");
+		//printf("the battery is not in charging\n");
 		return 0x00;
 	}
 }
@@ -82,6 +82,9 @@ void CloseVout2()
 	IP5328_WriteByte(vout12ctl, (state&0xDF));
 }
 void PowerOn(){
+	PB12=1;
+	TIMER_Delay(TIMER1, 100000);
+	PB12=0;
 	OpenVout1();
 	OpenVout2();
 }
