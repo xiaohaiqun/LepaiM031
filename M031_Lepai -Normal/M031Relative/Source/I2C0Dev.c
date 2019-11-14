@@ -9,7 +9,7 @@ void I2C0_GPIO_Init(){
 void I2C0_Init(void)
 {
     /* Open I2C module and set bus clock */
-    I2C_Open(I2C0, 100000);
+    I2C_Open(I2C0, 400000);
     /* Get I2C1 Bus Clock */
     //printf("I2C1 clock %d Hz\n", I2C_GetBusClockFreq(I2C1));
     /* Enable I2C interrupt */

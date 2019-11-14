@@ -8,7 +8,8 @@ extern uint8_t AccOn;
 extern uint8_t GyroOn;
 extern uint8_t MagnOn;
 extern uint8_t NowBtn;
-extern void PowerOn();
+extern uint8_t PowerOn();
+extern uint8_t PowerOff();
 extern void  CloseVout1();
 extern void	 CloseVout2();
 extern void reset();
@@ -34,34 +35,42 @@ uint32_t timecounter =0;
 extern uint8_t  Btn9timerStart;
 extern void BMM150Test();
 extern void BMM_whoami();
+uint8_t InPowerStarting=0;
+uint8_t timer0flag=0;
 void Btn9LongPressHandler()
 {
-	if(Btn9timerStart)
+	if(timer0flag)
 	{
-		timecounter++;
-		if(timecounter>=5){//长按关机
-			 Btn9timerStart=0;
-			  LEDChange(yellow);
-				CloseVout1();
-			  CloseVout2();			
-			 PowerState=0;
-		}
-		else if(timecounter>=2){
-			if(PowerState==1){//关机			
-				NowBtn=0x99;
-				PB5=!PB5;
-				LEDChange(red);
-			}
-			else if(PowerState==0)//开机
+		if(!InPowerStarting)
+		{
+			if(Btn9timerStart)
 			{
-				Btn9timerStart=0;
-				LEDChange(green);
-				PowerOn();
-				PowerState=1;
-				powerOnLight();					
-			}		
-		}			
-	}
+				timecounter++;
+				if(timecounter>=5){//长按关机
+						Btn9timerStart=0;
+						LEDChange(yellow);
+						PowerOff();
+				}
+				else if(timecounter>=2){
+					if(PowerState==1){//软关机			
+						NowBtn=0x99;
+						PB5=!PB5;
+						LEDChange(red);
+					}
+					else if(PowerState==0)//开机
+					{
+						InPowerStarting=1;
+						Btn9timerStart=0;
+						LEDChange(green);
+						PowerOn();
+						powerOnLight();
+						InPowerStarting=0;
+					}		
+				}			
+			}
+		}
+		timer0flag=0;
+	}	
 }
 
 extern uint8_t LEDOnWork;
@@ -82,8 +91,8 @@ void TMR0_IRQHandler(void)                    //used for btn9 long press count
    if(TIMER_GetIntFlag(TIMER0) == 1)
     {
       TIMER_ClearIntFlag(TIMER0);
-			Btn9LongPressHandler();
-			LEDBlink();
+			timer0flag=1;
+			//Btn9LongPressHandler();
 			I2C1PowerSpy();
 			//BMM150Test();
 			//BMM_whoami();

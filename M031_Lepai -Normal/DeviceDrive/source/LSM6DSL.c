@@ -5,7 +5,6 @@
 #include "NuMicro.h"
 #include "LSM6DSL.h"
 
-
 void LSM6DSL_WriteByte(uint8_t LSM6DSL_reg, uint8_t LSM6DSL_data)
 {
 	uint8_t temp=0,n=0;
@@ -188,10 +187,10 @@ void SensoODR_ONOFF_Handler(uint8_t u8data){
 		//open timerPriodicINT	
 		TIMER_Open(TIMER1, TIMER_PERIODIC_MODE, timerPriod);
 		TIMER_EnableInt(TIMER1);
-		NVIC_EnableIRQ(TMR1_IRQn);
-		TIMER_Start(TIMER1);
+		NVIC_EnableIRQ(TMR1_IRQn);		
 		Init_BMM150();
 		Init_LSM6DSL();
+		TIMER_Start(TIMER1);
 		//printf("nine sensor open: %d % d %d\n",AccOn,GyroOn,MagnOn);
 	}
 	else{

@@ -3,6 +3,7 @@
 #include <gpio.h>
 #include <pwm.h>
 #include <pwm_light.h>
+uint8_t LEDOnWork=0;
 void PWM_GPIO_Init(){
 	CLK_SetModuleClock(PWM0_MODULE, CLK_CLKSEL2_PWM0SEL_PCLK0, 0);
 	SYS_ResetModule(PWM0_RST);
@@ -23,6 +24,7 @@ void PWM_GPIO_Init(){
 
 void powerOnLight(){
 	int m, n;
+	LEDOnWork=1;
 	LEDChange(dark);
 	PWM_EnableOutput(PWM0, 0x3F);
 	PWM_Start(PWM0, 0x3F);
@@ -42,6 +44,7 @@ void powerOnLight(){
 	LEDChange(dark);
 	CLK_SysTickDelay(1000000000);
 	 //PWM_ForceStop(PWM0, 0x3F);	
+	LEDOnWork=0;
 }
 
 
@@ -148,4 +151,32 @@ void LED2Change(uint8_t Ledstate)
 		PWM_ConfigOutputChannel(PWM0,redpin2 , 2400000,r);
 		PWM_ConfigOutputChannel(PWM0,greenpin2 , 2400000,g);
 		PWM_ConfigOutputChannel(PWM0,bluepin2 , 2400000,b);
+}
+uint8_t rblink=0;
+void blinkred()
+{
+	if(rblink)
+	{
+		LEDChange(red);
+	}
+	else
+	{
+		LEDChange(dark);
+	}
+	rblink=!rblink;
+}
+
+
+uint8_t gblink;
+void blinkgreen()
+{
+	if(rblink)
+	{
+		LEDChange(green);
+	}
+	else
+	{
+		LEDChange(dark);
+	}
+	gblink=!gblink;
 }

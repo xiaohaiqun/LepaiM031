@@ -9,7 +9,7 @@ uint8_t PowerState=1;
 uint8_t IP5328_WriteByte(uint8_t IP5328_reg, uint8_t IP5328_data)
 {
 	uint8_t flag=0,n=0,temp;
-	for(n=0;n<100;n++){
+	for(n=0;n<1000;n++){
 		flag=I2C_WriteByteOneReg(I2C0,ip5328_slave_adress, IP5328_reg, IP5328_data);
 		temp=I2C_ReadByteOneReg(I2C0,ip5328_slave_adress,IP5328_reg);
 		if(temp==IP5328_data)
@@ -30,6 +30,25 @@ uint8_t IP5328_ReadMutiByte(uint8_t IP5328_reg,uint8_t* data,uint8_t len)
 ////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////just used for m031 test/////////////////////////////
+uint8_t PowerStateSetOn()
+{
+	if((IP5328_ReadByte(0x59)&0x04)==0x04)
+	{
+		PowerState=1;
+		return 1;
+	}
+	return 0;
+}
+uint8_t PowerStateSetOff()
+{
+	if((IP5328_ReadByte(0x59)&0x04)==0)
+	{
+		PowerState=0;
+		return 1;
+	}
+	return 0;
+}
+
 void keyInRead(uint8_t key)
 {
 	uint8_t keystate= IP5328_ReadByte(key);
@@ -81,16 +100,46 @@ void CloseVout2()
 	uint8_t state=IP5328_ReadByte(vout12ctl);
 	IP5328_WriteByte(vout12ctl, (state&0xDF));
 }
-void PowerOn(){
-	PB12=1;
+uint8_t PowerOn(){
+	uint8_t m=0,n=0;
+	PB13=1;
 	TIMER_Delay(TIMER1, 100000);
-	PB12=0;
-	OpenVout1();
-	OpenVout2();
+	PB13=0;
+	TIMER_Delay(TIMER1, 100000);
+	for(m=0;m<2;m++)
+	{
+		if(PB12)
+		{
+			OpenVout1();
+			OpenVout2();
+			I2C_SetBusClockFreq(I2C0,400000);
+			PowerStateSetOn();
+			return 1;
+		}
+		else
+			{//模拟1s内短按两次关机。
+			PB13=1;
+			TIMER_Delay(TIMER1, 100000);
+			PB13=0;
+			
+			TIMER_Delay(TIMER1, 60000);
+			
+			PB13=1;
+			TIMER_Delay(TIMER1, 100000);
+			PB13=0;
+		}
+	}
+	return 0;
 }
-void PowerOff(){
+uint8_t PowerOff(){
 	 CloseVout1();
 	 CloseVout2();
+	 I2C_SetBusClockFreq(I2C0,9000);
+	 TIMER_Stop(TIMER1);
+	 if(PowerStateSetOff())
+		 return 1;
+	 else
+			return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -128,8 +177,7 @@ void IP5328Init(){
 	IP5328_WriteByte(0x81, tempdata&0x00);
 	tempdata=IP5328_ReadByte(0x84);
 	IP5328_WriteByte(0x84, tempdata&0x00);
-	OpenVout1();
-	OpenVout2();
+	PowerOn();
 }
 //////////////////////////////////////////////////////////////////////////
 
@@ -152,14 +200,17 @@ uint8_t BATpower=0,ChargeInfo=0;
 void I2C1PowerSpy()
 {
 	uint8_t BATpower_Temp=0,ChargeInfo_Temp=0;
-	BATpower_Temp=IP5328_ReadByte(0xDB)&0x1F;          //灯显模式计算的电量
-	ChargeInfo_Temp=IP5328_ReadByte(0xD7);               //充电状态	
-	if(BATpower!=BATpower_Temp||ChargeInfo!=ChargeInfo_Temp)
+	if(PowerState)
 	{
-		BATpower=BATpower_Temp;
-		ChargeInfo=ChargeInfo_Temp;
-		NowBtn=0x55;
-		PB5=!PB5;
+		BATpower_Temp=IP5328_ReadByte(0xDB)&0x1F;          //灯显模式计算的电量
+		ChargeInfo_Temp=IP5328_ReadByte(0xD7);               //充电状态	
+		if(BATpower!=BATpower_Temp||ChargeInfo!=ChargeInfo_Temp)
+		{
+			BATpower=BATpower_Temp;
+			ChargeInfo=ChargeInfo_Temp;
+			NowBtn=0x55;
+			PB5=!PB5;
+		}
 	}
 }
 

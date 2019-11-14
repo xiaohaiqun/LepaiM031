@@ -11,11 +11,13 @@ extern uint8_t PowerState;
 extern uint8_t timecounter;
 uint8_t NowBtn=0xff;
 uint8_t Btn9timerStart=0;
-uint8_t LEDOnWork=0;
+extern uint8_t LEDOnWork;
 //this should be added to device_GPIO_Init();
 void Button_GPIO_Init(void)
 {
-		GPIO_SetMode(PB, (BIT12), GPIO_MODE_OUTPUT);
+		GPIO_SetMode(PB, (BIT13), GPIO_MODE_OUTPUT);//模拟按键控制引脚
+		GPIO_SetMode(PB, (BIT12), GPIO_MODE_INPUT); //ip5328 I2C状态检测引脚
+	
 		GPIO_SetMode(PB, (BIT1|BIT0), GPIO_MODE_QUASI);
 	  GPIO_SetMode(PF, (BIT3|BIT2|BIT15), GPIO_MODE_QUASI);
 		GPIO_SetMode(PA, (BIT12|BIT13|BIT14|BIT15), GPIO_MODE_QUASI); 
@@ -52,7 +54,7 @@ void Button_GPIO_Init(void)
 		GPIO_ENABLE_DEBOUNCE(PA, (BIT12|BIT13|BIT14|BIT15));
 		Btn9timerStart=0;
 		LEDOnWork=0;
-		PB12=0;
+		PB13=0;
 }
 //this shold be added to GPXXXXXXX_IRQHandle()
 static struct{
@@ -70,16 +72,21 @@ static struct{
 void Btn9pressHandler()
 {
 		/* Start Timer 0 */					
-		timecounter=0;      //计时归零
+	if(Btn9timerStart==0)     //计时归零
+	{
+		TIMER_Start(TIMER0);
+		timecounter=0;
 		Btn9timerStart=1;		//开始计时	
 		NowBtn=0x89;
 		LEDOnWork=1;        //占用PWM LED
 		LEDChange(blue);
+	}
 }
 //Button 弹起相关操作
 void Btn9releaseHandler()
 {
 		Btn9timerStart=0;
+	  timecounter=0;
 		NowBtn=0x09;
 		LEDChange(dark);
 		LEDOnWork=0;
