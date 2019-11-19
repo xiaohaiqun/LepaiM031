@@ -29,25 +29,28 @@ void GPCDEF_IRQHandler(void){
 void reset(){
 		SYS_Init();
 		I2C1_Init();
-		I2C0_Init();	
-		powerOnLight();			
+		I2C0_Init();
+		powerOnLight();		
 		Init_BMM150();
     Init_LSM6DSL();	
 		IP5328Init();
-    TIMER_Init();//time0 start after ip5328 is ready!	
+    TIMER_Init();//time0 start after ip5328 is ready!		
+			
 }
 extern uint8_t PowerState;
 extern void Timer0handler();
 extern void Timer1Handler();
+extern void BtnLongPressHandler();
+//extern void I2C1Handler();
 int32_t main()
 {
 		reset();
-		//BMM150Test();
-		//LSM6DSL_test();	
 		PowerState=1;
 		while(1){
 			Timer0Handler();
+			BtnLongPressHandler();
 			Timer1Handler();
+			I2C1Handler();
 			/*SYS_UnlockReg();
 			// Enable power wake-up interrupt 
 			CLK->PWRCTL |= CLK_PWRCTL_PDWKIEN_Msk;
@@ -93,7 +96,7 @@ int32_t main()
 			//printf("Slave wake-up from power down status.\n");
 
 			//printf("\n");
-		  //printf("Slave Waiting for receiving data.\n");
+			//printf("Slave Waiting for receiving data.\n");
 			 CLK_SysTickDelay(1000000000);
 			 CLK_SysTickDelay(1000000000);
 			 CLK_SysTickDelay(1000000000);
@@ -109,5 +112,5 @@ int32_t main()
 			 CLK_SysTickDelay(1000000000);
 			 CLK_SysTickDelay(1000000000);
 			 CLK_SysTickDelay(1000000000);*/
-		}
+	}
 }

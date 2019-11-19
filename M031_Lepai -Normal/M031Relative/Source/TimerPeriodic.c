@@ -33,10 +33,10 @@ void TIMER_GPIO_Init(){
 extern uint8_t PowerState;
 uint32_t timecounter =0;
 extern uint8_t  Btn9timerStart;
-extern void BMM150Test();
-extern void BMM_whoami();
+
 uint8_t InPowerStarting=0;
 uint8_t timer0flag=0;
+extern uint8_t powerOnLightFlag;
 void Btn9LongPressHandler()
 {
 
@@ -65,6 +65,7 @@ void Btn9LongPressHandler()
 					LEDChange(green);
 					PowerOn();
 					powerOnLight();
+					//powerOnLightFlag=1;
 					InPowerStarting=0;
 				}		
 			}			
@@ -72,15 +73,6 @@ void Btn9LongPressHandler()
 	}
 }
 extern void I2C1PowerSpy();
-void Timer0Handler()
-{
-	if(timer0flag)
-	{
-		Btn9LongPressHandler();
-		I2C1PowerSpy();
-		timer0flag=0;
-	}
-}
 extern uint8_t LEDOnWork;
 uint8_t LEDBlinkColor=0;
 void LEDBlink()
@@ -92,6 +84,33 @@ void LEDBlink()
 	}
 }
 
+uint8_t I2C0InUseFlag=0;
+uint8_t Timer0Tick=0;
+extern void I2C1readPower();
+extern void I2C1readVout1_2_A();
+extern void I2C1readBAT_V_I();
+void Timer0Handler()
+{
+	if(timer0flag)
+	{
+		Timer0Tick++;
+		if(Timer0Tick>100)
+		{
+			Timer0Tick=0;
+			Btn9LongPressHandler();
+			I2C1PowerSpy();
+			I2C1readPower();
+			I2C1readVout1_2_A();
+			I2C1readBAT_V_I();
+			//if(PB12)
+				LEDBlink();
+		}
+		timer0flag=0;
+	}
+}
+extern uint8_t i2cStartFlag;
+extern uint8_t i2cWaitCount;
+void BtnPressTimeCounter();
 void TMR0_IRQHandler(void)                    //used for btn9 long press count
 { 
    if(TIMER_GetIntFlag(TIMER0) == 1)
@@ -99,16 +118,20 @@ void TMR0_IRQHandler(void)                    //used for btn9 long press count
       TIMER_ClearIntFlag(TIMER0);
 			timer0flag=1;
 			//Btn9LongPressHandler();
-			
-			//BMM150Test();
-			//BMM_whoami();
+			BtnPressTimeCounter();
+			if(i2cStartFlag)
+			{
+			  i2cWaitCount++;
+			}
     }
 }
 uint8_t timer1flag=0;
+
 void Timer1Handler()
 {
-	if(timer1flag)
+	if(timer1flag&&(!I2C0InUseFlag))
 	{
+		I2C0InUseFlag=1;
 		if(AccOn)
 			{
 				I2C1readAcc(AccData[!AccP]);
@@ -121,10 +144,11 @@ void Timer1Handler()
 			}			
 			if(MagnOn)
 			{
-				I2C1readMagn(MagnData[!MagnP]);
+				//I2C1readMagn(MagnData[!MagnP]);
 				MagnP=!MagnP;
 			}
 		timer1flag=0;
+		I2C0InUseFlag=0;
 	}
 }
 void TMR1_IRQHandler(void)                              //used for  9Sensor 
@@ -139,7 +163,7 @@ void TMR1_IRQHandler(void)                              //used for  9Sensor
 }
 
 void TIMER_Init(void){
-	  TIMER_Open(TIMER0, TIMER_PERIODIC_MODE, 1);
+	  TIMER_Open(TIMER0, TIMER_PERIODIC_MODE,100);
     TIMER_EnableInt(TIMER0);
     /* Open Timer1 in periodic mode, enable interrupt and 2 interrupt ticks per second */    
 		//TIMER_Open(TIMER1, TIMER_PERIODIC_MODE, 50);
@@ -151,4 +175,4 @@ void TIMER_Init(void){
     /* Start Timer0 ~ Timer3 counting */
     TIMER_Start(TIMER0);
     //TIMER_Start(TIMER1);
-	}
+}
