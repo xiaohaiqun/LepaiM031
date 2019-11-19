@@ -21,10 +21,11 @@ void PWM_GPIO_Init(){
                     (SYS_GPF_MFPL_PF4MFP_PWM0_CH1 |
                      SYS_GPF_MFPL_PF5MFP_PWM0_CH0 );
 }
-
+//uint8_t m=0,n=0;
+uint8_t onOffBlink=0;
+uint8_t powerOnLightFlag=1;
 void powerOnLight(){
 	int m, n;
-	LEDOnWork=1;
 	LEDChange(dark);
 	PWM_EnableOutput(PWM0, 0x3F);
 	PWM_Start(PWM0, 0x3F);
@@ -44,9 +45,7 @@ void powerOnLight(){
 	LEDChange(dark);
 	CLK_SysTickDelay(1000000000);
 	 //PWM_ForceStop(PWM0, 0x3F);	
-	LEDOnWork=0;
 }
-
 
 void LEDChange(uint8_t Ledstate)
 {

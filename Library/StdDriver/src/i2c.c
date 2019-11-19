@@ -440,8 +440,8 @@ void I2C_DisableWakeup(I2C_T *i2c)
   * @details    The function is used for I2C Master write a byte data to Slave.
   *
   */
-uint8_t i2c_start_count=0;
-uint8_t i2c_wait_stop=0;
+uint8_t i2cStartFlag=0;
+uint8_t i2cWaitCount=0;
 
 uint8_t I2C_WriteByte(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t data)
 {
@@ -451,19 +451,18 @@ uint8_t I2C_WriteByte(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t data)
 
     while (u8Xfering && (u8Err == 0U))
     {
-        i2c_start_count=1;
-				i2c_wait_stop=0;
+        i2cStartFlag=1;
+				i2cWaitCount=0;
 				I2C_WAIT_READY(i2c) 
 				{
-					if(i2c_wait_stop)
+					if(i2cWaitCount>10)
 					{
 						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
-						i2c_start_count=0;						
+						i2cStartFlag=0;						
 						return 1;
 					}
 				}
-				i2c_start_count=0;
-				
+				i2cStartFlag=0;
         switch (I2C_GET_STATUS(i2c))
         {
         case 0x08:
@@ -588,20 +587,18 @@ uint8_t I2C_WriteByteOneReg(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t u8DataAddr,
 
     while (u8Xfering && (u8Err == 0U))
     {
-        i2c_start_count=1;
-				i2c_wait_stop=0;
+        i2cStartFlag=1;
+				i2cWaitCount=0;
 				I2C_WAIT_READY(i2c) 
 				{
-					if(i2c_wait_stop)
+					if(i2cWaitCount>10)
 					{
-						//I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
-						i2c_start_count=0;
-						i2c_wait_stop;
-						break;
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
 					}
 				}
-				i2c_wait_stop;
-				i2c_start_count=0;
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -673,7 +670,18 @@ uint32_t I2C_WriteMultiBytesOneReg(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t u8Da
 
     while (u8Xfering && (u8Err == 0U))
     {
-        I2C_WAIT_READY(i2c) {}
+        i2cStartFlag=1;
+				i2cWaitCount=0;
+				I2C_WAIT_READY(i2c) 
+				{
+					if(i2cWaitCount>10)
+					{
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
+					}
+				}
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -741,7 +749,18 @@ uint8_t I2C_WriteByteTwoRegs(I2C_T *i2c, uint8_t u8SlaveAddr, uint16_t u16DataAd
 
     while (u8Xfering && (u8Err == 0U))
     {
-        I2C_WAIT_READY(i2c) {}
+        i2cStartFlag=1;
+				i2cWaitCount=0;
+				I2C_WAIT_READY(i2c) 
+				{
+					if(i2cWaitCount>10)
+					{
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
+					}
+				}
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -818,7 +837,18 @@ uint32_t I2C_WriteMultiBytesTwoRegs(I2C_T *i2c, uint8_t u8SlaveAddr, uint16_t u1
 
     while (u8Xfering && (u8Err == 0U))
     {
-        I2C_WAIT_READY(i2c) {}
+        i2cStartFlag=1;
+				i2cWaitCount=0;
+				I2C_WAIT_READY(i2c) 
+				{
+					if(i2cWaitCount>10)
+					{
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
+					}
+				}
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -886,7 +916,18 @@ uint8_t I2C_ReadByte(I2C_T *i2c, uint8_t u8SlaveAddr)
 
     while (u8Xfering && (u8Err == 0U))
     {
-        I2C_WAIT_READY(i2c) {}
+        i2cStartFlag=1;
+				i2cWaitCount=0;
+				I2C_WAIT_READY(i2c) 
+				{
+					if(i2cWaitCount>10)
+					{
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
+					}
+				}
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -949,7 +990,18 @@ uint32_t I2C_ReadMultiBytes(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t rdata[], ui
 
     while (u8Xfering && (u8Err == 0U))
     {
-        I2C_WAIT_READY(i2c) {}
+        i2cStartFlag=1;
+				i2cWaitCount=0;
+				I2C_WAIT_READY(i2c) 
+				{
+					if(i2cWaitCount>10)
+					{
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
+					}
+				}
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -1024,20 +1076,18 @@ uint8_t I2C_ReadByteOneReg(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t u8DataAddr)
     while (u8Xfering && (u8Err == 0U))
     {
         
-			 i2c_start_count=1;
-				i2c_wait_stop=0;
+				i2cStartFlag=1;
+				i2cWaitCount=0;
 				I2C_WAIT_READY(i2c) 
 				{
-					if(i2c_wait_stop)
+					if(i2cWaitCount>10)
 					{
-						//I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
-						i2c_start_count=0;	
-						i2c_wait_stop;
-						break;
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
 					}
 				}
-				i2c_wait_stop;
-				i2c_start_count=0;
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -1121,18 +1171,18 @@ uint32_t I2C_ReadMultiBytesOneReg(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t u8Dat
 
     while (u8Xfering && (u8Err == 0U))
     {
-        i2c_start_count=1;
-				i2c_wait_stop=0;
+        i2cStartFlag=1;
+				i2cWaitCount=0;
 				I2C_WAIT_READY(i2c) 
 				{
-					if(i2c_wait_stop)
+					if(i2cWaitCount>10)
 					{
 						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
-						i2c_start_count=0;						
+						i2cStartFlag=0;						
 						return 1;
 					}
 				}
-				i2c_start_count=0;
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -1220,7 +1270,18 @@ uint8_t I2C_ReadByteTwoRegs(I2C_T *i2c, uint8_t u8SlaveAddr, uint16_t u16DataAdd
 
     while (u8Xfering && (u8Err == 0U))
     {
-        I2C_WAIT_READY(i2c) {}
+        i2cStartFlag=1;
+				i2cWaitCount=0;
+				I2C_WAIT_READY(i2c) 
+				{
+					if(i2cWaitCount>10)
+					{
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
+					}
+				}
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
@@ -1311,7 +1372,18 @@ uint32_t I2C_ReadMultiBytesTwoRegs(I2C_T *i2c, uint8_t u8SlaveAddr, uint16_t u16
 
     while (u8Xfering && (u8Err == 0U))
     {
-        I2C_WAIT_READY(i2c) {}
+       i2cStartFlag=1;
+				i2cWaitCount=0;
+				I2C_WAIT_READY(i2c) 
+				{
+					if(i2cWaitCount>10)
+					{
+						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
+						i2cStartFlag=0;						
+						return 1;
+					}
+				}
+				i2cStartFlag=0;
 
         switch (I2C_GET_STATUS(i2c))
         {
