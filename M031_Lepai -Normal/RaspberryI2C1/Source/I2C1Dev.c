@@ -45,7 +45,7 @@ void I2C1_Init(void)
 		I2C_EnableWakeup  ( I2C1 );
 		/* I2C enter no address SLV mode */
     I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI_AA);
-		//I2C_EnableTimeout(I2C1,3);
+		I2C_EnableTimeout(I2C1,1);
 }
 
 

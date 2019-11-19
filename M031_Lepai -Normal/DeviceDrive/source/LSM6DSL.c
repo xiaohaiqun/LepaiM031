@@ -12,7 +12,7 @@ void LSM6DSL_WriteByte(uint8_t LSM6DSL_reg, uint8_t LSM6DSL_data)
 		I2C_WriteByteOneReg(I2C0,LSM6DSL_I2C_SLA ,  LSM6DSL_reg, LSM6DSL_data);
 		temp=I2C_ReadByteOneReg(LSM6DSL_I2C_PORT,LSM6DSL_I2C_SLA,LSM6DSL_reg);
 		n++;
-		if(temp==LSM6DSL_data||n>10)
+		if(temp==LSM6DSL_data||n>3)
 			break;
 	}
 }
@@ -48,7 +48,6 @@ int16_t Read_LSM6DSL_AccX(void)
 int16_t Read_LSM6DSL_ACC(void)
 {
 	uint8_t bytes[2];
-	I2C_ReadByteTwoRegs(I2C0, LSM6DSL_I2C_SLA,LSM6DSL_ACC_GYRO_OUTX_H_XL );
 	I2C_ReadMultiBytesOneReg(I2C0, LSM6DSL_I2C_SLA, LSM6DSL_ACC_GYRO_OUTX_L_XL, bytes, 2);
 	return ((bytes[1]<<8)|bytes[0]);
 }

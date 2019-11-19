@@ -9,7 +9,7 @@ uint8_t PowerState=1;
 uint8_t IP5328_WriteByte(uint8_t IP5328_reg, uint8_t IP5328_data)
 {
 	uint8_t flag=0,n=0,temp;
-	for(n=0;n<1000;n++){
+	for(n=0;n<5;n++){
 		flag=I2C_WriteByteOneReg(I2C0,ip5328_slave_adress, IP5328_reg, IP5328_data);
 		temp=I2C_ReadByteOneReg(I2C0,ip5328_slave_adress,IP5328_reg);
 		if(temp==IP5328_data)

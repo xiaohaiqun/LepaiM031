@@ -15,8 +15,8 @@ extern uint8_t LEDOnWork;
 //this should be added to device_GPIO_Init();
 void Button_GPIO_Init(void)
 {
-		GPIO_SetMode(PB, (BIT13), GPIO_MODE_OUTPUT);//模拟按键控制引脚
-		GPIO_SetMode(PB, (BIT12), GPIO_MODE_INPUT); //ip5328 I2C状态检测引脚
+		//GPIO_SetMode(PB, (BIT13), GPIO_MODE_OUTPUT);//模拟按键控制引脚
+		//GPIO_SetMode(PB, (BIT12), GPIO_MODE_INPUT); //ip5328 I2C状态检测引脚
 	
 		GPIO_SetMode(PB, (BIT1|BIT0), GPIO_MODE_QUASI);
 	  GPIO_SetMode(PF, (BIT3|BIT2|BIT15), GPIO_MODE_QUASI);
@@ -141,57 +141,41 @@ void BtnLongPressHandler()
 		if(BtnTimer.btn1>LongPressTime)
 		{
 			NowBtn=0x91;
-			BtnIntFlag=0;
-			PB5=!PB5;			
 		}
 		else if(BtnTimer.btn2>LongPressTime)
 		{
-			NowBtn=0x92;
-			BtnIntFlag=0;
-			PB5=!PB5;			
+			NowBtn=0x92;		
 		}
 		else if(BtnTimer.btn3>LongPressTime)
 		{
 			NowBtn=0x93;
-			BtnIntFlag=0;
-			PB5=!PB5;			
 		}
 		else if(BtnTimer.btn4>LongPressTime)
 		{
-			NowBtn=0x94;
-			BtnIntFlag=0;
-			PB5=!PB5;			
+			NowBtn=0x94;		
 		}
 		else if(BtnTimer.btn5>LongPressTime)
 		{
-			NowBtn=0x95;
-			BtnIntFlag=0;
-			PB5=!PB5;			
+			NowBtn=0x95;	
 		}
 		else if(BtnTimer.btn6>LongPressTime)
 		{
-			NowBtn=0x96;
-			BtnIntFlag=0;
-			PB5=!PB5;			
+			NowBtn=0x96;		
 		}
 		else if(BtnTimer.btn7>LongPressTime)
 		{
-			NowBtn=0x97;
-			BtnIntFlag=0;
-			PB5=!PB5;			
+			NowBtn=0x97;			
 		}
 		else if(BtnTimer.btn8>LongPressTime)
 		{
-			NowBtn=0x98;
-			BtnIntFlag=0;
-			PB5=!PB5;					
+			NowBtn=0x98;				
 		}
 		else if(BtnTimer.btn9>LongPressTime)
 		{
-			NowBtn=0x99;
-			BtnIntFlag=0;
-			PB5=!PB5;					
+			NowBtn=0x99;					
 		}
+		BtnIntFlag=0;
+		PB5=!PB5;
 	}
 }
 
@@ -204,7 +188,7 @@ void Button_IRQHandler(void)
 		{
 			BtnTimer.btn1=0;
 			BtnIntFlag=1;
-			NowBtn=0x81;
+			NowBtn=0x81; 
 			PB5=!PB5;
 		}
 		else
@@ -396,10 +380,11 @@ void Button_IRQHandler(void)
 		ISButtonPressed.btn8=!ISButtonPressed.btn8;
 	}	
 	
- else if(GPIO_GET_INT_FLAG(PA, BIT15))
+  else if(GPIO_GET_INT_FLAG(PA, BIT15))
 	{
 		GPIO_CLR_INT_FLAG(PA, BIT15); 
-		if(!ISButtonPressed.btn9){//开关机键按下	
+		if(!ISButtonPressed.btn9)
+			{//开关机键按下	
 				BtnTimer.btn9=0;
 				BtnIntFlag=1;	
 				NowBtn=0x89;

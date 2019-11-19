@@ -30,11 +30,12 @@ void reset(){
 		SYS_Init();
 		I2C1_Init();
 		I2C0_Init();
-		powerOnLight();		
+    TIMER_Init();//time0 start after ip5328 is ready!	
+		//powerOnLight();	
 		Init_BMM150();
     Init_LSM6DSL();	
 		IP5328Init();
-    TIMER_Init();//time0 start after ip5328 is ready!		
+		powerOnLight();		
 			
 }
 extern uint8_t PowerState;
@@ -46,71 +47,11 @@ int32_t main()
 {
 		reset();
 		PowerState=1;
-		while(1){
+		while(1)
+		{
 			Timer0Handler();
 			BtnLongPressHandler();
 			Timer1Handler();
 			I2C1Handler();
-			/*SYS_UnlockReg();
-			// Enable power wake-up interrupt 
-			CLK->PWRCTL |= CLK_PWRCTL_PDWKIEN_Msk;
-			NVIC_EnableIRQ(PWRWU_IRQn);
-			g_u8SlvPWRDNWK = 0;
-			// Enable I2C wake-up 
-			I2C_EnableWakeup(I2C1);
-			g_u8SlvI2CWK = 0;
-			//printf("\n");
-			//printf("Enter PD 0x%x 0x%x\n", I2C1->CTL0, I2C1->STATUS0);
-			//printf("\n");
-			if(((I2C1->CTL0)&I2C_CTL0_SI_Msk) != 0)
-			{
-					I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI);
-			}
-			// Enter to Power-down mode 
-			//powerDownFunction();
-			//printf("CHIP enter power down status.\n");
-			UART_WAIT_TX_EMPTY(UART0);
-			CLK_PowerDown();
-			
-			//* Waiting for syteem wake-up and I2C wake-up finish
-			//while((g_u8SlvPWRDNWK & g_u8SlvI2CWK) == 0);
-
-			// Waitinn for I2C response ACK finish 
-			while(!I2C_GET_WAKEUP_DONE(I2C1));
-			//printf("CHIP wake up done.\n");
-			// Clear Wakeup done flag, I2C will release bus 
-			I2C_CLEAR_WAKEUP_DONE(I2C1);
-
-			//* Wake-up Interrupt Message 
-			//printf("Power-down Wake-up INT 0x%x\n", (unsigned int)((CLK->PWRCTL) & CLK_PWRCTL_PDWKIF_Msk));
-			//printf("I2C1 WAKE INT 0x%x\n", I2C1->WKSTS);
-
-			//* Disable power wake-up interrupt
-			CLK->PWRCTL &= ~CLK_PWRCTL_PDWKIEN_Msk;
-			NVIC_DisableIRQ(PWRWU_IRQn);
-
-			//* Lock protected registers 
-			SYS_LockReg();
-
-			//printf("\n");
-			//printf("Slave wake-up from power down status.\n");
-
-			//printf("\n");
-			//printf("Slave Waiting for receiving data.\n");
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);
-			 CLK_SysTickDelay(1000000000);*/
-	}
+		}
 }

@@ -98,10 +98,13 @@ void Timer0Handler()
 		{
 			Timer0Tick=0;
 			Btn9LongPressHandler();
-			I2C1PowerSpy();
-			I2C1readPower();
-			I2C1readVout1_2_A();
-			I2C1readBAT_V_I();
+			if(PowerState)
+			{
+				I2C1PowerSpy();
+				I2C1readPower();
+				I2C1readVout1_2_A();
+				I2C1readBAT_V_I();
+			}
 			//if(PB12)
 				LEDBlink();
 		}
@@ -153,7 +156,6 @@ void Timer1Handler()
 }
 void TMR1_IRQHandler(void)                              //used for  9Sensor 
 {
-		//printf("time1 INT\n");
 		if(TIMER_GetIntFlag(TIMER1) == 1)
     {
         /* Clear Timer1 time-out interrupt flag */
