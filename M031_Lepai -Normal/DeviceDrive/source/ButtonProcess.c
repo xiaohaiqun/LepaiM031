@@ -74,6 +74,8 @@ void Btn9pressHandler()
 		/* Start Timer 0 */					
 	if(Btn9timerStart==0)     //计时归零
 	{
+		TIMER_Open(TIMER0, TIMER_PERIODIC_MODE, 1);
+    TIMER_EnableInt(TIMER0); NVIC_EnableIRQ(TMR0_IRQn);
 		TIMER_Start(TIMER0);
 		timecounter=0;
 		Btn9timerStart=1;		//开始计时	
@@ -97,7 +99,8 @@ void Btn9releaseHandler()
 
 void Button_IRQHandler(void)
 { 
-		if(GPIO_GET_INT_FLAG(PB, BIT0))
+		
+	if(GPIO_GET_INT_FLAG(PB, BIT0))
     {
         GPIO_CLR_INT_FLAG(PB, BIT0);
 				if(!ISButtonPressed.btn1)
@@ -242,9 +245,7 @@ void Button_IRQHandler(void)
 			//printf("raspberry shutdown\n");
 			GPIO_CLR_INT_FLAG(PB, BIT4);
 			PowerOff();  //Shut down the power supply of raspbery and m51.
-			PowerState=0;
 		}
 		else
 			PB5=!PB5;
 }
-

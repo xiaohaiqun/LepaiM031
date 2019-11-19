@@ -211,9 +211,6 @@ void I2C1_IRQHandler(void)
     {
         /* Clear I2C1 Timeout Flag */
         I2C_ClearTimeoutFlag(I2C1);
-				//I2C_SET_CONTROL_REG(I2C1, I2C_CTL_STO_SI);  
-				//I2C_STOP(I2C1);
-				//I2C_Trigger(I2C1,0,1,1,1);
     }
     else
     {

@@ -37,7 +37,8 @@ void reset(){
     TIMER_Init();//time0 start after ip5328 is ready!	
 }
 extern uint8_t PowerState;
-extern void Btn9LongPressHandler();
+extern void Timer0handler();
+extern void Timer1Handler();
 int32_t main()
 {
 		reset();
@@ -45,7 +46,8 @@ int32_t main()
 		//LSM6DSL_test();	
 		PowerState=1;
 		while(1){
-			Btn9LongPressHandler();
+			Timer0Handler();
+			Timer1Handler();
 			/*SYS_UnlockReg();
 			// Enable power wake-up interrupt 
 			CLK->PWRCTL |= CLK_PWRCTL_PDWKIEN_Msk;
