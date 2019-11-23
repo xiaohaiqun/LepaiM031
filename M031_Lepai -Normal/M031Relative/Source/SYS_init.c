@@ -47,7 +47,7 @@ void SYS_Init(void)
     /* Lock protected registers */
     SYS_LockReg();
 		/* Reset UART0 */
-    SYS_ResetModule(UART0_RST); 
+    //SYS_ResetModule(UART0_RST); 
     /* Configure UART0 and set UART0 baud rate */
-    UART_Open(UART0, 115200);
+    //UART_Open(UART0, 115200);
 }

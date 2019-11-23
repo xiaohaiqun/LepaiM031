@@ -60,7 +60,8 @@ void I2C1_Close(void)
 }
 
 static uint8_t Order=0;
-static uint8_t *data=NULL;
+//static uint8_t *data=NULL;
+static uint8_t data[6]={0};
 static uint8_t datapoint=0;
 extern uint8_t BMM_whoami();
 extern uint8_t I2C0InUseFlag;
@@ -73,36 +74,38 @@ void ReadOrderHandler(uint8_t Order)
 			I2C_SET_DATA(I2C1, NowBtn);//button read
 			break;
 		case 0x83:
-			//I2C1readAcc(data);       //Acc read
-			data=AccData[AccP];
+			I2C1readAcc(data);       //Acc read
+			//data=AccData[AccP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x84:                   //Gyro read
-			//I2C1readGyro(data);
-			data=GyroData[GyroP];
+			I2C1readGyro(data);
+			//data=GyroData[GyroP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x85:                    //Magn read
-			//I2C1readMagn(data);
-			data=MagnData[MagnP];
+			I2C1readMagn(data);
+			//data=MagnData[MagnP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x8A:                   //Battery Powerdata read  
-			data=powerData[powerP];
+			I2C1readPower(data);
+			//data=powerData[powerP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x8B:                   //vout1 and vout2 I read, 
-			//I2C1readMagn(data);
-			data=vout12AData[vout12AP];
+			I2C1readVout1_2_A(data);
+			//data=vout12AData[vout12AP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x8C:                  //
-			data=batData[batDataP];
+			I2C1readBAT_V_I(data);
+			//data=batData[batDataP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
@@ -134,17 +137,10 @@ uint8_t writeOrder=0;
 uint8_t writeData=0;
 void I2C1Handler()
 {
-	/*if(I2C1ReadFlag)
-	{
-		ReadOrderHandler(readOrder);
-		I2C1ReadFlag=0;
-	}*/
-	if(I2C1WriteFlag&(!I2C0InUseFlag))
+	if(I2C1WriteFlag)
 	{		
-		I2C0InUseFlag=1;
 		WriteOrderHandler(writeOrder,writeData);
 		I2C1WriteFlag=0;
-		I2C0InUseFlag=0;
 	}
 }
 
@@ -161,10 +157,10 @@ void I2C_SlaveTRx(uint32_t u32Status)
 		u8data = (unsigned char) I2C_GET_DATA(I2C1);
 		I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI_AA);
 		if((Order&0xC0)==0x40){
-			//WriteOrderHandler(Order,u8data);
-			I2C1WriteFlag=1;
-			writeOrder=Order;
-			writeData=u8data;
+			WriteOrderHandler(Order,u8data);
+			//I2C1WriteFlag=1;
+			//writeOrder=Order;
+			//writeData=u8data;
 			Order=0x00;
 		}
 		else{

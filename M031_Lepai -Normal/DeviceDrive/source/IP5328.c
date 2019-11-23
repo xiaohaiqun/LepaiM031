@@ -9,7 +9,7 @@ uint8_t PowerState=1;
 uint8_t IP5328_WriteByte(uint8_t IP5328_reg, uint8_t IP5328_data)
 {
 	uint8_t flag=0,n=0,temp;
-	for(n=0;n<5;n++){
+	for(n=0;n<10;n++){
 		flag=I2C_WriteByteOneReg(I2C0,ip5328_slave_adress, IP5328_reg, IP5328_data);
 		temp=I2C_ReadByteOneReg(I2C0,ip5328_slave_adress,IP5328_reg);
 		if(temp==IP5328_data)
@@ -49,29 +49,6 @@ uint8_t PowerStateSetOff()
 	return 0;
 }
 
-void keyInRead(uint8_t key)
-{
-	uint8_t keystate= IP5328_ReadByte(key);
-	if((keystate&0x01)){
-		//printf("key is not pressed!\n");
-	}
-	else{
-		//printf("key is  pressed\n");
-	}
-}
-#define CHG_STATUS 0xD7
-uint8_t chg_status_Read()
-{
-	uint8_t state=IP5328_ReadByte(CHG_STATUS);
-	if(state&0x80){
-		//printf("the battery is in charging\n");
-		return 0x01;
-	}
-	else{
-		//printf("the battery is not in charging\n");
-		return 0x00;
-	}
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////vout1 and vout2 ctl///////////////////////////////////
@@ -180,9 +157,10 @@ void IP5328Init(){
 	//测试9v
 	
 	PowerOn();
-	
-	tempdata=IP5328_ReadByte(0x4C);
-	IP5328_WriteByte(0x4C, tempdata|0x0A);
+	//OpenVout1();
+	//OpenVout2();
+	//tempdata=IP5328_ReadByte(0x4C);
+	//IP5328_WriteByte(0x4C, tempdata|0x0A);
 }
 //////////////////////////////////////////////////////////////////////////
 
@@ -207,17 +185,14 @@ extern uint8_t I2C0InUseFlag;
 void I2C1PowerSpy()
 {
 	uint8_t BATpower_Temp=0,ChargeInfo_Temp=0;
-	if(PowerState)
+	BATpower_Temp=(IP5328_ReadByte(0xDB)&0x1F);          //灯显模式计算的电量
+	ChargeInfo_Temp=IP5328_ReadByte(0xD7);               //充电状态	
+	if((BATpower!=BATpower_Temp)||(ChargeInfo!=ChargeInfo_Temp))
 	{
-		BATpower_Temp=IP5328_ReadByte(0xDB)&0x1F;          //灯显模式计算的电量
-		ChargeInfo_Temp=IP5328_ReadByte(0xD7);               //充电状态	
-		if(BATpower!=BATpower_Temp||ChargeInfo!=ChargeInfo_Temp)
-		{
-			BATpower=BATpower_Temp;
-			ChargeInfo=ChargeInfo_Temp;
-			NowBtn=0x55;
-			//PB5=!PB5;
-		}
+		BATpower=BATpower_Temp;
+		ChargeInfo=ChargeInfo_Temp;
+		NowBtn=0x55;
+		PB5=!PB5;
 	}
 }
 uint8_t powerP=0;

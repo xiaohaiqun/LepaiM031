@@ -184,16 +184,17 @@ void SensoODR_ONOFF_Handler(uint8_t u8data){
 		}
 	if(AccOn||GyroOn||MagnOn){
 		//open timerPriodicINT	
-		TIMER_Open(TIMER1, TIMER_PERIODIC_MODE, timerPriod);
+		/*TIMER_Open(TIMER1, TIMER_PERIODIC_MODE, timerPriod);
 		TIMER_EnableInt(TIMER1);
 		NVIC_EnableIRQ(TMR1_IRQn);		
 		Init_BMM150();
 		Init_LSM6DSL();
-		TIMER_Start(TIMER1);
-		//printf("nine sensor open: %d % d %d\n",AccOn,GyroOn,MagnOn);
+		TIMER_Start(TIMER1);*/
+		;
 	}
 	else{
 		//CLose timePriodicINT
-		TIMER_Stop(TIMER1);
+		//TIMER_Stop(TIMER1);
+		;
 	}
 }

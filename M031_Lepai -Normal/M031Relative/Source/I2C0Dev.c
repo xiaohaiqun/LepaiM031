@@ -9,7 +9,7 @@ void I2C0_GPIO_Init(){
 void I2C0_Init(void)
 {
     /* Open I2C module and set bus clock */
-    I2C_Open(I2C0, 8000);
+    I2C_Open(I2C0, 400000);
     /* Enable I2C interrupt */
     I2C_DisableInt(I2C0);
 		I2C_DisableTimeout(I2C0);

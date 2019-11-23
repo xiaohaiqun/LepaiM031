@@ -11,7 +11,6 @@
 #include "TimerPeriodic.h"
 //DEBUG_ENABLE_SEMIHOST
 /////////////////////////////////////////////////////////
-extern volatile uint8_t g_u8SlvPWRDNWK, g_u8SlvI2CWK;
 
 void device_GPIO_Init(){
 	Button_GPIO_Init();
@@ -28,19 +27,17 @@ void GPCDEF_IRQHandler(void){
 }
 void reset(){
 		SYS_Init();
-		I2C1_Init();
-		I2C0_Init();
-    TIMER_Init();//time0 start after ip5328 is ready!	
-		//powerOnLight();	
+		I2C0_Init(); 
+		I2C1_Init();		
+		powerOnLight();	
 		Init_BMM150();
     Init_LSM6DSL();	
-		IP5328Init();
-		powerOnLight();		
-			
+		IP5328Init();	
+		TIMER_Init();//time0 start after ip5328 is ready!			
 }
 extern uint8_t PowerState;
 extern void Timer0handler();
-extern void Timer1Handler();
+//extern void Timer1Handler();
 extern void BtnLongPressHandler();
 //extern void I2C1Handler();
 int32_t main()
@@ -51,7 +48,5 @@ int32_t main()
 		{
 			Timer0Handler();
 			BtnLongPressHandler();
-			Timer1Handler();
-			I2C1Handler();
 		}
 }
