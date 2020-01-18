@@ -5,6 +5,7 @@
 extern uint8_t NowBtn;
 extern uint8_t PowerOn();
 extern uint8_t PowerOff();
+extern void reset();
 extern uint8_t PowerState;
 
 void TIMER_GPIO_Init(){
@@ -18,15 +19,15 @@ void TIMER_GPIO_Init(){
     CLK_SetModuleClock(TMR2_MODULE, CLK_CLKSEL1_TMR2SEL_HIRC, 0);
     CLK_SetModuleClock(TMR3_MODULE, CLK_CLKSEL1_TMR3SEL_HIRC, 0);
 }
-extern uint8_t PowerState;
 uint32_t timecounter =0;
 extern uint8_t  Btn9timerStart;
 
 uint8_t InPowerStarting=0;
 uint8_t timer0flag=0;
 
-extern uint8_t powerOnLightFlag;
-
+extern uint8_t ShutDownFlag;
+uint8_t InPowerOffFlag=0;
+uint8_t ShutDownTime=0;
 void Btn9LongPressHandler()
 {
 
@@ -39,7 +40,9 @@ void Btn9LongPressHandler()
 			{//长按关机
 					Btn9timerStart=0;
 					LEDChange(yellow);
+					InPowerOffFlag=1;
 					PowerOff();
+					InPowerOffFlag=0;
 			}
 			else if(timecounter>=2)
 			{
@@ -53,11 +56,30 @@ void Btn9LongPressHandler()
 					InPowerStarting=1;
 					Btn9timerStart=0;
 					LEDChange(green);
+					//reset();
 					PowerOn();
 					powerOnLight();
 					InPowerStarting=0;
 				}		
 			}			
+		}
+	}
+	if(ShutDownFlag)
+	{
+		ShutDownTime++;
+		if(ShutDownTime>=30)
+		{
+			if(PB4)
+			{
+				if(!InPowerOffFlag)
+				{
+					InPowerOffFlag=1;
+					PowerOff();  //Shut down the power supply of raspbery and m51.
+					InPowerOffFlag=0;
+				}
+			}
+			ShutDownTime=0;
+			ShutDownFlag=0;
 		}
 	}
 }
@@ -85,8 +107,8 @@ void Timer0Handler()
 		{
 			Timer0Tick=0;
 			Btn9LongPressHandler();
-			if(PB12)
-				LEDBlink();
+			//if(PB12)
+				//LEDBlink();
 		}
 		timer0flag=0;
 	}

@@ -469,7 +469,7 @@ uint8_t I2C_WriteByteOneReg(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t u8DataAddr,
 				i2cWaitCount=0;
 				I2C_WAIT_READY(i2c) 
 				{
-					if(i2cWaitCount>2)
+					if(i2cWaitCount>5)
 					{
 						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
 						i2cStartFlag=0;						
@@ -549,7 +549,7 @@ uint8_t I2C_ReadByteOneReg(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t u8DataAddr)
 				I2C_WAIT_READY(i2c) 
 				{
 					
-					if(i2cWaitCount>2)
+					if(i2cWaitCount>5)
 					{
 						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
 						i2cStartFlag=0;						
@@ -642,7 +642,7 @@ uint32_t I2C_ReadMultiBytesOneReg(I2C_T *i2c, uint8_t u8SlaveAddr, uint8_t u8Dat
 				i2cWaitCount=0;
 				I2C_WAIT_READY(i2c) 
 				{
-					if(i2cWaitCount>2)
+					if(i2cWaitCount>5)
 					{
 						I2C_SET_CONTROL_REG(i2c, I2C_CTL_STO_SI); 
 						i2cStartFlag=0;						

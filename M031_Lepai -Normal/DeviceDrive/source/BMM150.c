@@ -25,12 +25,34 @@ void BMM150_Read6Bytes(uint8_t BMM_reg,uint8_t* data)
 	I2C_ReadMultiBytesOneReg(I2C0,0x10, BMM_reg,data, 6);
 }
 
+#define BMM150_ODR-OPMODE_ADDR 0x4C
+#define BMM150_ODR_mask     0x38
+#define BMM150_ODR_30HZ 0x38
+#define BMM150_OPMODE_mask  0x06
+#define BMM150_OPMODE_ToNormalMode  0x00
+#define BMM150_OPMODE_ToForceMode   0x02
+#define BMM150_OPMODE_ToSleepMode   0x06
+
+#define BMM150_RESET-POWERMODE_ADDR 0x4B
+#define BMM150_POWERMODE_mask 0x01
+#define BMM150_POWERMODE_ToSuspend 0x00
+#define BMM150_POWERMODE_ ToWork   0x01
+
 void Init_BMM150()
 {
 	//printf("BMM150 init...............\n");
-	I2C_WriteByteOneReg(I2C0,0x10,0x4B,0x01);
-	I2C_WriteByteOneReg(I2C0,0x10,0x4C,0x38);	
+	I2C_WriteByteOneReg(I2C0,0x10,0x4B,0x01); //上电，进入工作模式。
+	//I2C_WriteByteOneReg(I2C0,0x10,0x4C,0x38);	//30HZ,正常模式 	
 }
+void BMM150_ToSleepMOde()
+{
+	I2C_WriteByteOneReg(I2C0,0x10,0x4C,0x3E);	//
+}
+void BMM150_ToNormalMode()
+{
+	I2C_WriteByteOneReg(I2C0,0x10,0x4C,0x38);	//
+}
+
 uint8_t BMM_whoami()
 {
 	uint8_t ID=0;
@@ -87,12 +109,6 @@ void BMM150Test(){
 /////////////////////I2C read orderhandler/////////////////////////////
 void I2C1readMagn(uint8_t* data){
 	uint16_t temp=0;
-	/*data[0]=BMM_ReadByte(0x43);
-	data[1]=BMM_ReadByte(0x42);
-	data[2]=BMM_ReadByte(0x45);
-	data[3]=BMM_ReadByte(0x44);
-	data[4]=BMM_ReadByte(0x47);
-	data[5]=BMM_ReadByte(0x46);*/
 	BMM150_Read6Bytes(0x42,data);  //LoByte is at first.
 	temp=data[1]<<8|data[0];
 	temp=temp>>3;

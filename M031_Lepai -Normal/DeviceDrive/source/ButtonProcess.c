@@ -29,7 +29,7 @@ void Button_GPIO_Init(void)
 	  //////////////////////////////////////////////////////////
 	  //////for display raspberry's state////////////////////
 		GPIO_SetMode(PB, BIT4, GPIO_MODE_QUASI);
-	  GPIO_EnableInt(PB, (4), GPIO_INT_FALLING); //raspberry ONOFF
+		GPIO_EnableInt(PB, (4), GPIO_INT_RISING); //raspberry ONOFF,上升沿触发（raspberry软关机时关机引脚变为高电平）
     
 	  //多余引脚配置成输入模式
 		GPIO_SetMode(PF, BIT0|BIT1, GPIO_MODE_INPUT);
@@ -94,10 +94,11 @@ void Btn9pressHandler()
 		Btn9timerStart=1;		//开始计时	
 		//NowBtn=0x89;
 		LEDOnWork=1;        //占用PWM LED
-		LEDChange(blue);
+		//LEDChange(blue);
 	}
 }
 //Button 弹起相关操作
+extern uint8_t shutdonwn_flag;
 void Btn9releaseHandler()
 {
 		Btn9timerStart=0;
@@ -194,6 +195,7 @@ void BtnLongPressHandler()
 		}
 	}
 }
+uint8_t ShutDownFlag=0;
 
 void Button_IRQHandler(void)
 { 	
@@ -427,6 +429,6 @@ void Button_IRQHandler(void)
 	if(GPIO_GET_INT_FLAG(PB, BIT4)){
 		//printf("raspberry shutdown\n");
 		GPIO_CLR_INT_FLAG(PB, BIT4);
-		PowerOff();  //Shut down the power supply of raspbery and m51.
+		ShutDownFlag=1;
 	}
 }

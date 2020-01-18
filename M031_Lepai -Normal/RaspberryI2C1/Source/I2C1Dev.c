@@ -15,15 +15,6 @@ extern void I2C1readBAT_V_I();
 extern void PowerHandler(uint8_t u8data);
 extern void SensoODR_ONOFF_Handler(uint8_t u8data);
 
-extern uint8_t AccP,GyroP,MagnP,powerP,batDataP,vout12AP;
-extern uint8_t AccData[2][6];
-extern uint8_t GyroData[2][6];
-extern uint8_t MagnData[2][6];
-extern uint8_t powerData[2][4];
-extern uint8_t vout12AData[2][4];
-extern uint8_t batData[2][4];
-
-
 void I2C1_GPIO_Init(void)
 {
 		CLK_EnableModuleClock(I2C1_MODULE);
@@ -60,11 +51,10 @@ void I2C1_Close(void)
 }
 
 static uint8_t Order=0;
-//static uint8_t *data=NULL;
+
 static uint8_t data[6]={0};
 static uint8_t datapoint=0;
-extern uint8_t BMM_whoami();
-extern uint8_t I2C0InUseFlag;
+
 
 void ReadOrderHandler(uint8_t Order)
 {
@@ -72,40 +62,36 @@ void ReadOrderHandler(uint8_t Order)
 	switch(Order){
 		case 0x82:
 			I2C_SET_DATA(I2C1, NowBtn);//button read
+			if((NowBtn&0xF0)==0x10||(NowBtn&0xF0)==0x00)
+				NowBtn=0;
 			break;
 		case 0x83:
 			I2C1readAcc(data);       //Acc read
-			//data=AccData[AccP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x84:                   //Gyro read
 			I2C1readGyro(data);
-			//data=GyroData[GyroP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x85:                    //Magn read
 			I2C1readMagn(data);
-			//data=MagnData[MagnP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x8A:                   //Battery Powerdata read  
 			I2C1readPower(data);
-			//data=powerData[powerP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x8B:                   //vout1 and vout2 I read, 
 			I2C1readVout1_2_A(data);
-			//data=vout12AData[vout12AP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
 		case 0x8C:                  //
 			I2C1readBAT_V_I(data);
-			//data=batData[batDataP];
 			datapoint=0;
 			I2C_SET_DATA(I2C1, data[datapoint++]);
 			break;
@@ -123,16 +109,13 @@ void WriteOrderHandler(uint8_t Order,uint8_t u8data)
 			PowerHandler(u8data);
 			break;
 		case 0x46:
-			//printf("Sensensor ONOff handler!\n");
 			SensoODR_ONOFF_Handler(u8data);
 			break;
 		default:
 			break;
 	}	
 }
-uint8_t I2C1ReadFlag=0;
 uint8_t I2C1WriteFlag=0;
-uint8_t readOrder=0;
 uint8_t writeOrder=0;
 uint8_t writeData=0;
 void I2C1Handler()
@@ -158,9 +141,6 @@ void I2C_SlaveTRx(uint32_t u32Status)
 		I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI_AA);
 		if((Order&0xC0)==0x40){
 			WriteOrderHandler(Order,u8data);
-			//I2C1WriteFlag=1;
-			//writeOrder=Order;
-			//writeData=u8data;
 			Order=0x00;
 		}
 		else{
@@ -172,8 +152,6 @@ void I2C_SlaveTRx(uint32_t u32Status)
 	{
 		if((Order&0xC0)==0x80){
 			ReadOrderHandler(Order);
-				//I2C1ReadFlag=1;
-				//readOrder=Order;
 		}
 		else{
 			I2C_SET_DATA(I2C1, 0x00);
@@ -188,19 +166,16 @@ void I2C_SlaveTRx(uint32_t u32Status)
 	else if(u32Status == 0xC0)                 /* Data byte or last data in I2CDAT has been transmitted
 																								 Not ACK has been received */
 	{
-			//printf("5 ");
 			I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI_AA);
 	}
 	else if(u32Status == 0x88)                 /* Previously addressed with own SLA address; NOT ACK has
 																								 been returned */
 	{
-			 //printf("6 ");
 			I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI_AA);
 	}
 	else if(u32Status == 0xA0)                 /* A STOP or repeated START has been received while still
 																								 addressed as Slave/Receiver*/
 	{
-			// printf("7 \n");
 			I2C_SET_CONTROL_REG(I2C1, I2C_CTL_SI_AA);
 	}
 	else
@@ -220,7 +195,6 @@ void I2C1_IRQHandler(void)
         /* Clear I2C Wake-up interrupt flag */
         I2C_CLEAR_WAKEUP_FLAG(I2C1);
         g_u8SlvI2CWK = 1;
-				//printf("I2C1 wake up\n");
     }
     u32Status = I2C_GET_STATUS(I2C1);
 
@@ -246,7 +220,5 @@ void PWRWU_IRQHandler(void)
         /* Clear system power down wake-up interrupt flag */
         CLK->PWRCTL |= CLK_PWRCTL_PDWKIF_Msk;
         g_u8SlvPWRDNWK = 1;
-				//printf("powerdown wake up\n");
-
     }
 }

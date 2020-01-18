@@ -30,8 +30,8 @@ void LSM6DSL_Read6Bytes(uint8_t LSM6DSL_reg,uint8_t* data)
 void Init_LSM6DSL(void)
 {
 	//printf("MPU init start******************\n");
-	LSM6DSL_WriteByte(LSM6DSL_ACC_GYRO_CTRL1_XL, LSM6DSL_ACC_ODR_833_HZ);
-	LSM6DSL_WriteByte(LSM6DSL_ACC_GYRO_CTRL2_G, LSM6DSL_GYRO_ODR_833_HZ);
+	//LSM6DSL_WriteByte(LSM6DSL_ACC_GYRO_CTRL1_XL, LSM6DSL_ACC_ODR_833_HZ);
+	//LSM6DSL_WriteByte(LSM6DSL_ACC_GYRO_CTRL2_G, LSM6DSL_GYRO_ODR_833_HZ);
 	//printf("*************************************\n");
 	LSM6DSL_WriteByte(LSM6DSL_ACC_GYRO_CTRL6_C, 1);  	// open gravity
 	LSM6DSL_WriteByte(LSM6DSL_ACC_GYRO_CTRL7_G, 1);
@@ -114,30 +114,18 @@ void LSM6DSL_test(){
 		}
 }
 
-
-///////////////////////////////////////////////////////////
 ////////////I2C1 Order Handler////////////////////////////
 void I2C1readAcc(uint8_t* data){
-	/*data[0]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTX_H_XL);
-	data[1]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTX_L_XL);
-	data[2]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTY_H_XL);
-	data[3]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTY_L_XL);
-	data[4]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTZ_H_XL);
-	data[5]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTZ_L_XL);*/
 	LSM6DSL_Read6Bytes(LSM6DSL_ACC_GYRO_OUTX_L_XL,data);    //LoByte is at first.
 }
 
 void I2C1readGyro(uint8_t* data){
-	/* data[0]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTX_H_G);
-	data[1]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTX_L_G);
-	data[2]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTY_H_G);
-	data[3]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTY_L_G);
-	data[4]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTZ_H_G);
-	data[5]=LSM6DSL_ReadByte(LSM6DSL_ACC_GYRO_OUTZ_L_G);*/
 	LSM6DSL_Read6Bytes(LSM6DSL_ACC_GYRO_OUTX_L_G,data);  //LoByte is at first.
 }
 
 extern void Init_BMM150();
+extern void BMM150_ToSleepMOde();
+extern void BMM150_ToNormalMode();
 uint8_t AccOn=0,GyroOn=0,MagnOn=0;
 void SensoODR_ONOFF_Handler(uint8_t u8data){
 	int timerPriod=0;
@@ -158,9 +146,11 @@ void SensoODR_ONOFF_Handler(uint8_t u8data){
 		GyroOn=0;
 	}
 	if(u8data&0x04){
+		BMM150_ToNormalMode();
 		MagnOn=1;
 	}
 	else{
+		BMM150_ToSleepMOde();
 		MagnOn=0;
 	}
 	switch(u8data&0xF0){                  //handler ODR 
@@ -183,18 +173,10 @@ void SensoODR_ONOFF_Handler(uint8_t u8data){
 				break;
 		}
 	if(AccOn||GyroOn||MagnOn){
-		//open timerPriodicINT	
-		/*TIMER_Open(TIMER1, TIMER_PERIODIC_MODE, timerPriod);
-		TIMER_EnableInt(TIMER1);
-		NVIC_EnableIRQ(TMR1_IRQn);		
 		Init_BMM150();
 		Init_LSM6DSL();
-		TIMER_Start(TIMER1);*/
-		;
 	}
 	else{
-		//CLose timePriodicINT
-		//TIMER_Stop(TIMER1);
 		;
 	}
 }

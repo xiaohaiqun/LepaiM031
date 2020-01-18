@@ -29,7 +29,7 @@ void powerOnLight(){
 	LEDChange(dark);
 	PWM_EnableOutput(PWM0, 0x3F);
 	PWM_Start(PWM0, 0x3F);
-	for(m=0;m<3;m++){
+	for(m=0;m<5;m++){
 		 for(n=0;n<100;n++){
 			PWM_ConfigOutputChannel(PWM0, redpin1,  24000,n);
 			PWM_ConfigOutputChannel(PWM0, greenpin1,24000,100-n);

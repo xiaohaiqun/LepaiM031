@@ -108,6 +108,7 @@ uint8_t PowerOn(){
 	}
 	return 0;
 }
+
 uint8_t PowerOff(){
 	 CloseVout1();
 	 CloseVout2();
@@ -195,29 +196,22 @@ void I2C1PowerSpy()
 		PB5=!PB5;
 	}
 }
-uint8_t powerP=0;
-uint8_t powerData[2][4]={0};           //电池读取数据缓存，4个字节，公用
-void I2C1readPower()          //读取电池电量估计以及充电状态信息，两个字节
+
+void I2C1readPower(uint8_t* data)          //读取电池电量估计以及充电状态信息，两个字节
 {
-	powerP=!powerP;
-	powerData[powerP][0]=IP5328_ReadByte(0xDB)&0x1F;          //灯显模式计算的电量
-	powerData[powerP][1]=IP5328_ReadByte(0xD7);               //充电状态	
-	IP5328_ReadMutiByte(BATOCV_DAT_L,powerData[powerP]+2,2);  //开路电压读取，用于进一步估算电池电量
+	data[0]=IP5328_ReadByte(0xDB)&0x1F;          //灯显模式计算的电量
+	data[1]=IP5328_ReadByte(0xD7);               //充电状态	
+	IP5328_ReadMutiByte(BATOCV_DAT_L,data+2,2);  //开路电压读取，用于进一步估算电池电量
 }
 
-uint8_t vout12AP=0;
-uint8_t vout12AData[2][4]={0};
-void I2C1readVout1_2_A()   //读取Vout1和vout2的输出电流，4个字节
+void I2C1readVout1_2_A(uint8_t* data)   //读取Vout1和vout2的输出电流，4个字节
 {
-	vout12AP=!vout12AP;
-	IP5328_ReadMutiByte(VOUT1IADC_DAT_L,vout12AData[vout12AP],4);
+	IP5328_ReadMutiByte(VOUT1IADC_DAT_L,data,4);
 }
-uint8_t batDataP=0;
-uint8_t batData[2][4]={0};
-void I2C1readBAT_V_I()     //读取电池的电压和电流，4个字节
+
+void I2C1readBAT_V_I(uint8_t* data)     //读取电池的电压和电流，4个字节
 {
-	batDataP=!batDataP;
-	IP5328_ReadMutiByte(BATVADC_DAT_L,batData[batDataP],4);
+	IP5328_ReadMutiByte(BATVADC_DAT_L,data,4);
 }
 
 ///////////////////////////////////
